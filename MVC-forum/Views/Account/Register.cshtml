@@ -1,0 +1,44 @@
+@model MVC_forum.Models.RegisterViewModel
+
+<h1 class="m-3" style="font-variant-caps: small-caps;">Registracija</h1>
+
+<form asp-action="Register" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <span class="badge bg-primary m-1" style="font-size: 90%;">Uporabniško ime</span>
+        <input asp-for="Username" class="form-control bg-dark-subtle" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <span class="badge bg-primary mt-2 m-1" style="font-size: 90%;">Geslo</span>
+        <input asp-for="Password" class="form-control bg-dark-subtle" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <span class="badge bg-primary mt-2 m-1" style="font-size: 90%;">Potrdi geslo</span>
+        <input asp-for="ConfirmPassword" class="form-control bg-dark-subtle" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <span class="badge bg-primary mt-2 m-1" style="font-size: 90%;">Profilna slika</span>
+        <input type="file" name="profilePicture" id="profilePicture" class="form-control-file w-100 border-5 bg-dark-subtle rounded-2 text-black"/>
+    </div>
+    <div class="mt-2 mb-2">
+        <input type="checkbox" class="btn-check" id="btncheck1" checked="" autocomplete="off" asp-for="SaveLogin" onchange="toggleLabel(this)">
+        <label class="btn btn-primary" for="btncheck1" asp-for="SaveLogin" id="btncheck1-label">Ostani prijavljen ❌</label>
+    </div>
+    <button type="submit" class="btn btn-success mt-3" style="width: 10%">Registriraj se</button>
+</form>
+
+@section Scripts {
+    <script>
+        function toggleLabel(checkbox) {
+            var label = document.getElementById('btncheck1-label');
+            if (checkbox.checked) {
+                label.innerText = 'Ostani prijavljen ❌';
+            } else {
+                label.innerText = 'Ostani prijavljen ✅';
+            }
+        }
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,9 @@
+riderModule.iml
+.aider*
+.env
+/MVC-forum/wwwroot/slike/*
+/_ReSharper.Caches/
+bin/
+obj/
+/packages/
+/MVC-forum/Migrations/*

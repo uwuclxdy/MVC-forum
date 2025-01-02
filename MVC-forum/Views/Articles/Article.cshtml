@@ -1,0 +1,67 @@
+@model MVC_forum.Models.Entities.Article
+
+<h1 class="m-3" style="font-variant-caps: small-caps;">@Model.Title</h1>
+
+@if (File.Exists(System.IO.Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot/slike/{Model.Id}.jpg")))
+{
+    <div class="text-center m-3">
+        <img src="@Url.Content($"~/slike/{Model.Id}.jpg")" class="card-img-top rounded-2" style="max-height: 480px; max-width: fit-content">
+    </div>
+}
+
+<p class="mt-4 mb-4">@Model.Content</p>
+
+<hr/>
+
+<div class="card text-white mb-3" style="width: 35%; margin-left: 65%">
+    <h4 class="card-header">Avtor</h4>
+    <div class="card-body">
+        
+        <a href="@Url.Action("Profile", "Account", new { username = Model.Author })" style="text-decoration: none;">
+            <img src="@Model.AuthorPFP" class="rounded-2" style="width: 15%">
+            <br/>
+            <div class="card-title" style="font-size: 140%">@Model.Author</div>
+        </a>
+    </div>
+    <div class="card-footer bg-secondary">
+        <p class="card-text">@Model.Date.ToString("yyyy-MM-dd ob HH:mm")</p>
+    </div>
+</div>
+
+<br/>
+
+@if (User.Identity is { IsAuthenticated: true })
+{
+    <div class="card text-white mb-3">
+        <h4 class="card-header">Komentiraj</h4>
+        <div class="card-body">
+            <form asp-controller="Comments" asp-action="Create" method="post">
+                <input type="hidden" name="articleId" value="@Model.Id" />
+                <div class="form-group">
+                    <textarea name="content" class="form-control bg-dark-subtle" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Objavi</button>
+            </form>
+        </div>
+    </div>
+}
+
+
+<div>
+    @foreach (var comment in Model.Comments)
+    {
+        <div class="card mb-2">
+            <div class="card-header text-light">
+                <a href="@Url.Action("Profile", "Account", new { username = comment.User?.UserName })" class="text-body" style="text-decoration: none;">
+                    <img src="@Model.AuthorPFP" class="rounded-2" style="width: 2%"> @comment.User?.UserName
+                </a>
+            </div>
+            <div class="card-body">
+                <p class="card-text">@comment.Content</p>
+            </div>
+            <div class="card-footer">@comment.CreatedAt.ToString("yyyy-MM-dd ob HH:mm")</div>
+        </div>
+    }
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Nazaj</a>

@@ -1,0 +1,11 @@
+@model List<MVC_forum.Models.Entities.Article>
+
+<h1 class="m-3" style="font-variant-caps: small-caps;">Vsi Članki</h1>
+
+@if (User.Identity is { IsAuthenticated: true })
+{
+    <a href="@Url.Action("Add", "Articles")" class="btn btn-primary mb-3">Objavi nov članek</a>
+}
+
+@await Html.PartialAsync("_ArticleList", Model)
+
