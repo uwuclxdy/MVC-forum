@@ -1,12 +1,12 @@
 @model List<MVC_forum.Models.Entities.Article>
 
 <div class="row">
-    @if (Model == null)
+    @if (Model == null || Model.Count == 0 || !Model.Any())
     {
         <div class="col-md-12 mb-3">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Trenutno še ni objavljenih člankov x/</h5>
+                    <h5 class="card-title">Trenutno še ni objavljenih člankov</h5>
                     <p class="card-text">Bodite prvi in objavite svojega!</p>
                 </div>
             </div>
