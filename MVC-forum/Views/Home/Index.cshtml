@@ -8,49 +8,5 @@
 <h1 class="m-3" style="font-variant-caps: small-caps;">Najnovejše objave</h1>
 
 <div class="row">
-    @if (!Model.Any())
-    {
-        <div class="col-md-12 mb-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Trenutno še ni objavljenih člankov x/</h5>
-                    <p class="card-text">Bodite prvi in objavite svojega!</p>
-                </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        @foreach (var clanek in Model)
-        {
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    @if (File.Exists(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "slike", $"{clanek.Id}.jpg")))
-                    {
-                        <a href="@Url.Action("Article", "Articles", new { id = clanek.Id })">
-                            <img src="@Url.Content($"~/slike/{clanek.Id}.jpg")" class="card-img-top" style="height: 240px; object-fit: cover;">
-                        </a>
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">@clanek.Title</h5>
-
-                        @if (clanek.Content.Length > 45)
-                        {
-                            <p class="card-text">@(clanek.Content[..45])...</p>
-                        }
-                        else
-                        {
-                            <p class="card-text">@clanek.Content</p>
-                        }
-
-                        <p class="card-text"><small class="text-muted">Objavil: @clanek.Author</small></p>
-                        <a href="@Url.Action("Article", "Articles", new { id = clanek.Id })" class="btn btn-primary">Read More</a>
-                    </div>
-                    <div class="card-footer">
-                        @clanek.Date.Date.ToShortDateString()
-                    </div>
-                </div>
-            </div>
-        }
-    }
+    @await Html.PartialAsync("_ArticleList", Model)
 </div>
