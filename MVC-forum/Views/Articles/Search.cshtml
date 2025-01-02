@@ -2,34 +2,11 @@
 
 @if (Model.Results.Any())
 {
-    <h1 class="m-3" style="font-variant-caps: small-caps;">Rezultati iskanja za "@Model.Query"</h1>
-    <div class="row">
-        @for (int i = 0; i < Model.Results.Count; i++)
-        {
-            var clanek = Model.Results[i];
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <img src="@Url.Content($"~/slike/{clanek.Id}.jpg")" class="card-img-top">
-                    <div class="card-body">
-                        <h5 class="card-title">@clanek.Title</h5>
-                        <p class="card-text">@clanek.Content</p>
-                        <p class="card-text"><small class="text-muted">Author: @clanek.Author</small></p>
-                        <p class="card-text"><small class="text-muted">Created: @clanek.Date</small></p>
-                        <a href="@Url.Action("Article", new { id = clanek.Id })" class="btn btn-primary">Preberi</a>
-                    </div>
-                </div>
-            </div>
-            @if ((i + 1) % 3 != 0)
-            {
-                continue;
-            }
-
-            <div class="row"></div>
-        }
-    </div>
+    <h1 class="m-3" style="font-variant-caps: small-caps;">Rezultati iskanja za @Model.Query</h1>
+    @await Html.PartialAsync("_ArticleList", Model.Results)
 }
 
 else
 {
-    <h1 class="m-3" style="font-variant-caps: small-caps;">Za "@Model.Query" ni rezultatov</h1>
+    <h1 class="m-3" style="font-variant-caps: small-caps;">Za @Model.Query ni rezultatov</h1>
 }
