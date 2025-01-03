@@ -12,42 +12,43 @@ namespace MVC_forum.Controllers
     public class AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext dbContext) : Controller
     {
         [HttpGet]
-         public async Task<IActionResult> Profile(string? username)
-         {
-             User? user;
-             if (username == null)
-             {
-                 user = await userManager.GetUserAsync(User);
-                 if (user == null) return NotFound();
+        public async Task<IActionResult> Profile(string? username)
+        {
+            User? user;
+            if (username == null)
+            {
+                user = await userManager.GetUserAsync(User);
+                if (user == null) return NotFound();
 
-                 user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
+                user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
+                user.NumberOfComments = await dbContext.Comments.CountAsync(c => c.User != null && c.User.UserName == user.UserName);
 
-                 var model = new ProfileViewModel
-                 {
-                     User = user,
-                     ChangePassViewModel = new ChangePassViewModel()
-                 };
-                 return View(model);
-             }
-             else
-             {
+                var model = new ProfileViewModel
+                {
+                    User = user,
+                    ChangePassViewModel = new ChangePassViewModel()
+                };
+                return View(model);
+            }
+            else
+            {
+                user = await userManager.FindByNameAsync(username);
+                if (user == null)
+                {
+                    TempData["error"] = "User not found.";
+                    return RedirectToAction("Index", "Home");
+                }
 
-                 user = await userManager.FindByNameAsync(username);
-                 if (user == null)
-                 {
-                     TempData["error"] = "User not found.";
-                     return RedirectToAction("Index", "Home");
-                 }
+                user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
+                user.NumberOfComments = await dbContext.Comments.CountAsync(c => c.User != null && c.User.UserName == user.UserName);
 
-                 user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
-
-                 var model = new ProfileViewModel
-                 {
-                     User = user
-                 };
-                 return View(model);
-             }
-         }
+                var model = new ProfileViewModel
+                {
+                    User = user
+                };
+                return View(model);
+            }
+        }
 
         [HttpGet]
         public IActionResult Register()
@@ -66,7 +67,13 @@ namespace MVC_forum.Controllers
                 return View(viewModel);
             }
 
-            var user = new User { UserName = viewModel.Username, NormalizedUserName = viewModel.Username.Normalize() };
+            var user = new User
+            {
+                UserName = viewModel.Username,
+                NormalizedUserName = viewModel.Username.Normalize(),
+                RegistrationDate = DateTime.UtcNow,
+                LastLogin = DateTime.UtcNow
+            };
 
             if (profilePicture != null)
             {
@@ -116,10 +123,16 @@ namespace MVC_forum.Controllers
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, model.SaveLogin, lockoutOnFailure: false);
-            Console.WriteLine(result);
 
             if (result.Succeeded)
             {
+                var user = await userManager.FindByNameAsync(model.Username);
+                if (user != null)
+                {
+                    user.LastLogin = DateTime.UtcNow;
+                    await userManager.UpdateAsync(user);
+                }
+
                 TempData["success"] = "Prijava uspešna!";
                 return RedirectToAction("Index", "Home");
             }
