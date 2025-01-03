@@ -1,4 +1,3 @@
-using System.Collections;
 using Microsoft.AspNetCore.Identity;
 
 namespace MVC_forum.Models.Entities;
