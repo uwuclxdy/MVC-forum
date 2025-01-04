@@ -5,11 +5,11 @@ namespace MVC_forum.Models;
 public class AddArticleViewModel
 {
     [Required]
-    public required string Title { get; set; }
+    public required string Title { get; init; }
 
     [Required]
-    public required string Content { get; set; }
+    public required string Content { get; init; }
 
     [Display(Name = "Img")]
-    public IFormFile? Img { get; set; }
+    public IFormFile? Img { get; init; }
 }

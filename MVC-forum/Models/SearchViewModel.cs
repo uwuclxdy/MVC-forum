@@ -4,6 +4,6 @@ namespace MVC_forum.Models;
 
 public class SearchViewModel
 {
-    public string Query { get; set; } = "";
-    public List<Article> Results { get; set; } = [];
+    public string Query { get; init; } = "";
+    public List<Article> Results { get; init; } = [];
 }
