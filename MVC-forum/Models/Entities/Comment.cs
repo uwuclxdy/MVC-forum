@@ -1,15 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MVC_forum.Models.Entities;
 
 public class Comment
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public required Guid ArticleId { get; set; }
+    public required Guid ArticleId { get; init; }
 
-    public required string Content { get; set; }
+    [MaxLength(1000)]
+    public required string Content { get; init; }
 
-    public required DateTime CreatedAt { get; set; }
-
-    public required string UserId { get; set; }
-    public User? User { get; set; }
+    public required DateTime CreatedAt { get; init; }
+    public required User User { get; init; }
 }

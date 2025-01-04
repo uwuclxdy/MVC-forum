@@ -7,186 +7,188 @@ using MVC_forum.Models.Entities;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
-namespace MVC_forum.Controllers
+namespace MVC_forum.Controllers;
+
+public class AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext dbContext) : Controller
 {
-    public class AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext dbContext) : Controller
+    [HttpGet]
+    public async Task<IActionResult> Profile(string? username)
     {
-        [HttpGet]
-        public async Task<IActionResult> Profile(string? username)
+        User? user;
+        if (username == null)
         {
-            User? user;
-            if (username == null)
+            user = await userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
+            user.NumberOfComments = await dbContext.Comments.CountAsync(c => c.User.UserName == user.UserName);
+
+            var model = new ProfileViewModel
             {
-                user = await userManager.GetUserAsync(User);
-                if (user == null) return NotFound();
-
-                user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
-                user.NumberOfComments = await dbContext.Comments.CountAsync(c => c.User != null && c.User.UserName == user.UserName);
-
-                var model = new ProfileViewModel
-                {
-                    User = user,
-                    ChangePassViewModel = new ChangePassViewModel()
-                };
-                return View(model);
-            }
-            else
-            {
-                user = await userManager.FindByNameAsync(username);
-                if (user == null)
-                {
-                    TempData["error"] = "User not found.";
-                    return RedirectToAction("Index", "Home");
-                }
-
-                user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
-                user.NumberOfComments = await dbContext.Comments.CountAsync(c => c.User != null && c.User.UserName == user.UserName);
-
-                var model = new ProfileViewModel
-                {
-                    User = user
-                };
-                return View(model);
-            }
-        }
-
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel viewModel, IFormFile? profilePicture)
-        {
-            if (!ModelState.IsValid) return View(viewModel);
-
-            if (await userManager.FindByNameAsync(viewModel.Username) != null)
-            {
-                TempData["error"] = "Uporabniško ime že obstaja!";
-                return View(viewModel);
-            }
-
-            var user = new User
-            {
-                UserName = viewModel.Username,
-                NormalizedUserName = viewModel.Username.Normalize(),
-                RegistrationDate = DateTime.UtcNow,
-                LastLogin = DateTime.UtcNow
+                User = user,
+                ChangePassViewModel = new ChangePassViewModel()
             };
-
-            if (profilePicture != null)
+            return View(model);
+        }
+        else
+        {
+            user = await userManager.FindByNameAsync(username);
+            if (user == null)
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/pfp", user.Id + Path.GetExtension(profilePicture.FileName));
-
-                using var image = await Image.LoadAsync(profilePicture.OpenReadStream());
-                image.Mutate(x => x.Resize(new ResizeOptions
-                {
-                    Size = new Size(200, 200),
-                    Mode = ResizeMode.Crop
-                }));
-                await image.SaveAsync(filePath);
-
-                user.PFPDir = Path.Combine("/pfp", user.Id + Path.GetExtension(profilePicture.FileName));
-            }
-            else
-            {
-                user.PFPDir = "/pfp/default-pfp.jpg";
-            }
-
-            var result = await userManager.CreateAsync(user, viewModel.Password);
-
-            if (result.Succeeded)
-            {
-                await signInManager.SignInAsync(user, isPersistent: viewModel.SaveLogin);
-                TempData["success"] = "Registracija uspešna!";
+                TempData["error"] = "User not found.";
                 return RedirectToAction("Index", "Home");
             }
 
-            // TODO: fix error handling
-            TempData["error"] = result.Errors;
-            foreach (var error in ModelState.Values.SelectMany(state => state.Errors))
-            {
-                ModelState.AddModelError("", error.ErrorMessage);
-            }
+            user.Articles = await dbContext.Articles.Where(a => a.Author == user.UserName).ToListAsync();
+            user.NumberOfComments = await dbContext.Comments.CountAsync(c => c.User.UserName == user.UserName);
 
+            var model = new ProfileViewModel
+            {
+                User = user
+            };
+            return View(model);
+        }
+    }
+
+    [HttpGet]
+    public IActionResult Register()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterViewModel viewModel, IFormFile? profilePicture)
+    {
+        if (!ModelState.IsValid) return View(viewModel);
+
+        if (await userManager.FindByNameAsync(viewModel.Username) != null)
+        {
+            TempData["error"] = "Uporabniško ime že obstaja!";
             return View(viewModel);
         }
 
-        [HttpGet]
-        public IActionResult Login()
+        var user = new User
         {
-            return View();
-        }
+            UserName = viewModel.Username,
+            NormalizedUserName = viewModel.Username.Normalize(),
+            RegistrationDate = DateTime.UtcNow,
+            LastLogin = DateTime.UtcNow
+        };
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        if (profilePicture != null)
         {
-            var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, model.SaveLogin, lockoutOnFailure: false);
-
-            if (result.Succeeded)
-            {
-                var user = await userManager.FindByNameAsync(model.Username);
-                if (user != null)
-                {
-                    user.LastLogin = DateTime.UtcNow;
-                    await userManager.UpdateAsync(user);
-                }
-
-                TempData["success"] = "Prijava uspešna!";
-                return RedirectToAction("Index", "Home");
-            }
-
-            TempData["error"] = "Napaka pri prijavi!";
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Logout()
-        {
-            await signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangeProfilePicture(IFormFile? profilePicture)
-        {
-            var user = await userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
-
-            if (profilePicture == null) return RedirectToAction("Profile");
-
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/pfp", user.Id + Path.GetExtension(profilePicture.FileName));
-            var oldProfilePicturePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot" + user.PFPDir);
 
             using var image = await Image.LoadAsync(profilePicture.OpenReadStream());
-            image.Mutate(x => x.Resize(new ResizeOptions {
+            image.Mutate(x => x.Resize(new ResizeOptions
+            {
                 Size = new Size(200, 200),
                 Mode = ResizeMode.Crop
             }));
-
-            if (oldProfilePicturePath != Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/pfp/default-pfp.jpg")) System.IO.File.Delete(oldProfilePicturePath);
-
             await image.SaveAsync(filePath);
 
-            user.PFPDir = Path.Combine("/pfp", user.Id + Path.GetExtension(profilePicture.FileName));
-            await userManager.UpdateAsync(user);
-
-            return RedirectToAction("Profile");
+            user.PfpDir = Path.Combine("/pfp", user.Id + Path.GetExtension(profilePicture.FileName));
+        }
+        else
+        {
+            user.PfpDir = "/pfp/default-pfp.jpg";
         }
 
-        // TODO: fix password change
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePassViewModel model)
+        var result = await userManager.CreateAsync(user, viewModel.Password);
+
+        if (result.Succeeded)
         {
-            var user = await userManager.GetUserAsync(User);
+            await signInManager.SignInAsync(user, isPersistent: viewModel.SaveLogin);
+            TempData["success"] = "Registracija uspešna!";
+            return RedirectToAction("Index", "Home");
+        }
 
-            Console.WriteLine(model);
-            Console.WriteLine(model.OldPassword);
-            Console.WriteLine(model.NewPassword);
+        // TODO: fix error handling
+        TempData["error"] = result.Errors;
+        foreach (var error in ModelState.Values.SelectMany(state => state.Errors))
+        {
+            ModelState.AddModelError("", error.ErrorMessage);
+        }
 
-            if (user == null) return RedirectToAction("Profile");
+        return View(viewModel);
+    }
 
+    [HttpGet]
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel model)
+    {
+        var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, model.SaveLogin, lockoutOnFailure: false);
+
+        if (result.Succeeded)
+        {
+            var user = await userManager.FindByNameAsync(model.Username);
+            if (user != null)
+            {
+                user.LastLogin = DateTime.UtcNow;
+                await userManager.UpdateAsync(user);
+            }
+
+            TempData["success"] = "Prijava uspešna!";
+            return RedirectToAction("Index", "Home");
+        }
+
+        TempData["error"] = "Napaka pri prijavi!";
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+        await signInManager.SignOutAsync();
+        return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ChangeProfilePicture(IFormFile? profilePicture)
+    {
+        var user = await userManager.GetUserAsync(User);
+        if (user == null) return NotFound();
+
+        if (profilePicture == null) return RedirectToAction("Profile");
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/pfp", user.Id + Path.GetExtension(profilePicture.FileName));
+        var oldProfilePicturePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot" + user.PfpDir);
+
+        using var image = await Image.LoadAsync(profilePicture.OpenReadStream());
+        image.Mutate(x => x.Resize(new ResizeOptions {
+            Size = new Size(200, 200),
+            Mode = ResizeMode.Crop
+        }));
+
+        if (oldProfilePicturePath != Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/pfp/default-pfp.jpg")) System.IO.File.Delete(oldProfilePicturePath);
+
+        await image.SaveAsync(filePath);
+
+        user.PfpDir = Path.Combine("/pfp", user.Id + Path.GetExtension(profilePicture.FileName));
+        await userManager.UpdateAsync(user);
+
+        return RedirectToAction("Profile");
+    }
+
+    // TODO: fix password change
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePassViewModel model)
+    {
+        var user = await userManager.GetUserAsync(User);
+
+        Console.WriteLine(model);
+        Console.WriteLine(model.OldPassword);
+        Console.WriteLine(model.NewPassword);
+
+        if (user == null) return RedirectToAction("Profile");
+
+        if (model is { OldPassword: not null, NewPassword: not null })
+        {
             var changePasswordResult = await userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
             if (!changePasswordResult.Succeeded) return RedirectToAction("Profile");
@@ -195,10 +197,16 @@ namespace MVC_forum.Controllers
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
-
-            // TODO: add popup messages
-            TempData["success"] = "Your password has been changed. Please log in with your new password.";
-            return RedirectToAction("Index", "Home");
         }
+        else
+        {
+            // need to debug ts
+            Console.WriteLine("OldPassword: " + model.OldPassword);
+            Console.WriteLine("NewPassword: " + model.NewPassword);
+        }
+
+        // TODO: add popup messages
+        TempData["success"] = "Your password has been changed. Please log in with your new password.";
+        return RedirectToAction("Index", "Home");
     }
 }

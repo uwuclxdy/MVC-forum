@@ -1,11 +1,10 @@
 using MVC_forum.Models.Entities;
 
-namespace MVC_forum.Models
+namespace MVC_forum.Models;
+
+public class ProfileViewModel
 {
-    public class ProfileViewModel
-    {
-        public User User { get; set; }
-        public ChangePassViewModel ChangePassViewModel { get; set; }
-        public int NumberOfArticles => User.Articles.Count;
-    }
+    public required User User { get; init; }
+    public ChangePassViewModel ChangePassViewModel { get; init; } = null!;
+    public int NumberOfArticles => User.Articles!.Count;
 }

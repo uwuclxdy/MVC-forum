@@ -1,20 +1,24 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MVC_forum.Models.Entities;
 
 public class Article
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public required string Title { get; set; }
+    [MaxLength(60)]
+    public required string Title { get; init; }
 
-    public string Img { get; set; } = "";
+    [MaxLength(100000)]
+    public required string Content { get; init; }
 
-    public required string Content { get; set; }
+    [MaxLength(30)]
+    public required string Author { get; init; }
 
-    public required string Author { get; set; }
+    [MaxLength(1000)]
+    public required string? AuthorPfp { get; init; }
 
-    public required string AuthorPFP { get; set; }
+    public required DateTime Date { get; init; }
 
-    public required DateTime Date { get; set; }
-
-    public List<Comment> Comments { get; set; } = [];
+    public List<Comment> Comments { get; init; } = [];
 }

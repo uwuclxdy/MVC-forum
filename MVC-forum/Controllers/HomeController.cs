@@ -5,18 +5,11 @@ using MVC_forum.Models;
 
 namespace MVC_forum.Controllers;
 
-public class HomeController : Controller
+public class HomeController(ApplicationDbContext dbContext) : Controller
 {
-    private readonly ApplicationDbContext _dbContext;
-
-    public HomeController(ApplicationDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public IActionResult Index()
     {
-        var latestClanki = _dbContext.Articles
+        var latestClanki = dbContext.Articles
             .OrderByDescending(c => c.Date)
             .Take(3)
             .ToList();

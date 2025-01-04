@@ -18,7 +18,7 @@
     <div class="card-body">
         
         <a href="@Url.Action("Profile", "Account", new { username = Model.Author })" style="text-decoration: none;">
-            <img src="@Model.AuthorPFP" class="rounded-2" style="width: 15%">
+            <img src="@Model.AuthorPfp" class="rounded-2" style="width: 15%">
             <br/>
             <div class="card-title" style="font-size: 140%">@Model.Author</div>
         </a>
@@ -52,8 +52,8 @@
     {
         <div class="card mb-2">
             <div class="card-header text-light">
-                <a href="@Url.Action("Profile", "Account", new { username = comment.User?.UserName })" class="text-body" style="text-decoration: none;">
-                    <img src="@Model.AuthorPFP" class="rounded-2" style="width: 2%"> @comment.User?.UserName
+                <a href="@Url.Action("Profile", "Account", new { username = comment.User.UserName })" class="text-body" style="text-decoration: none;">
+                    <img src="@Model.AuthorPfp" class="rounded-2" style="width: 2%"> @comment.User.UserName
                 </a>
             </div>
             <div class="card-body">

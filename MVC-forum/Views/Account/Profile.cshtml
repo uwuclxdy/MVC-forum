@@ -12,7 +12,7 @@
                     <a class="nav-link active" style="font-size: 150%;">Profilna slika</a>
                 </li>
             </ul>
-            <img src="@Model.User.PFPDir" class="mx-auto d-block mt-3 rounded-2" style="width: 60%">
+            <img src="@Model.User.PfpDir" class="mx-auto d-block mt-3 rounded-2" style="width: 60%">
         </div>
         <form asp-action="ChangeProfilePicture" method="post" enctype="multipart/form-data">
             <ul class="list-group list-group-flush align-items-center">
@@ -90,7 +90,7 @@
         }
         else
         {
-            @foreach (var article in Model.User.Articles)
+            @foreach (var article in Model.User.Articles!)
             {
                 <div class="col-md-4 mb-3">
                     <div class="card">
@@ -140,7 +140,7 @@ else
                         <a class="nav-link active" style="font-size: 150%;">Profilna slika</a>
                     </li>
                 </ul>
-                <img src="@Model.User.PFPDir" class="mx-auto d-block mt-3 rounded-2" style="width: 60%">
+                <img src="@Model.User.PfpDir" class="mx-auto d-block mt-3 rounded-2" style="width: 60%">
             </div>
         </div>
         <!-- user info -->
@@ -188,7 +188,7 @@ else
             }
             else
             {
-                @foreach (var article in Model.User.Articles)
+                @foreach (var article in Model.User.Articles!)
                 {
                     <div class="col-md-4 mb-3">
                         <div class="card">

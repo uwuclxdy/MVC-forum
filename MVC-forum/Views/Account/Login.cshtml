@@ -14,8 +14,8 @@
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <div class="mt-2 mb-2">
-        <input type="checkbox" class="btn-check" id="btncheck1" checked="" autocomplete="off" asp-for="SaveLogin" onchange="toggleLabel(this)">
-        <label class="btn btn-primary" for="btncheck1" asp-for="SaveLogin" id="btncheck1-label">Ostani prijavljen ❌</label>
+        <input type="checkbox" class="btn-check" id="btncheck1" checked="checked" autocomplete="off" asp-for="SaveLogin" onchange="toggleLabel(this)">
+        <label class="btn btn-primary" for="btncheck1" asp-for="SaveLogin" id="btncheck1-label">Ostani prijavljen ✅</label>
     </div>
     <button type="submit" class="btn btn-success mt-3" style="width: 10%">Prijavi se</button>
 </form>
@@ -23,11 +23,11 @@
 @section Scripts {
     <script>
         function toggleLabel(checkbox) {
-            var label = document.getElementById('btncheck1-label');
+            const label = document.getElementById('btncheck1-label');
             if (checkbox.checked) {
-                label.innerText = 'Ostani prijavljen ❌';
-            } else {
                 label.innerText = 'Ostani prijavljen ✅';
+            } else {
+                label.innerText = 'Ostani prijavljen ❌';
             }
         }
     </script>

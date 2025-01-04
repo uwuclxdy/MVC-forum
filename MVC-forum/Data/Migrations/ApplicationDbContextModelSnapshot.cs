@@ -32,7 +32,7 @@ namespace MVC_forum.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorPFP")
+                    b.Property<string>("AuthorPfp")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
