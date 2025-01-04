@@ -19,17 +19,24 @@ public class ArticlesController(ApplicationDbContext dbContext, UserManager<User
         return View(articles);
     }
 
+    [HttpGet]
     public IActionResult Article(Guid id)
-    {
-        var article = dbContext.Articles
-            .Include(c => c.Comments)
-            .ThenInclude(c => c.User)
-            .FirstOrDefault(c => c.Id == id);
+{
+    var article = dbContext.Articles
+        .Include(c => c.Comments)
+        .ThenInclude(c => c.User)
+        .FirstOrDefault(c => c.Id == id);
 
-        if (article == null) return NotFound();
+    if (article == null) return NotFound();
 
-        return View(article);
-    }
+    var author = dbContext.Users.FirstOrDefault(u => u.UserName == article.Author);
+    if (author == null || author.PfpDir == article.AuthorPfp) return View(article);
+
+    article.AuthorPfp = author.PfpDir;
+    dbContext.SaveChanges();
+
+    return View(article);
+}
 
     [HttpGet]
     public IActionResult Add()

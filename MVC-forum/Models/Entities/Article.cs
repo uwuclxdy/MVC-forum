@@ -16,7 +16,7 @@ public class Article
     public required string Author { get; init; }
 
     [MaxLength(1000)]
-    public required string? AuthorPfp { get; init; }
+    public required string? AuthorPfp { get; set; }
 
     public required DateTime Date { get; init; }
 
