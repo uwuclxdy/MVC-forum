@@ -10,9 +10,7 @@
 }
 
 <p class="mt-4 mb-4">@Model.Content</p>
-
 <hr/>
-
 <div class="card text-white mb-3" style="width: 35%; margin-left: 65%">
     <h4 class="card-header">Avtor</h4>
     <div class="card-body">
@@ -27,9 +25,7 @@
         <p class="card-text">@Model.Date.ToString("yyyy-MM-dd ob HH:mm")</p>
     </div>
 </div>
-
 <br/>
-
 @if (User.Identity is { IsAuthenticated: true })
 {
     <div class="card text-white mb-3">
@@ -46,14 +42,13 @@
     </div>
 }
 
-
 <div>
     @foreach (var comment in Model.Comments)
     {
         <div class="card mb-2">
             <div class="card-header text-light">
                 <a href="@Url.Action("Profile", "Account", new { username = comment.User.UserName })" class="text-body" style="text-decoration: none;">
-                    <img src="@Model.AuthorPfp" class="rounded-2" style="width: 2%"> @comment.User.UserName
+                    <img src="@comment.User.PfpDir" class="rounded-2" style="width: 2%"> @comment.User.UserName
                 </a>
             </div>
             <div class="card-body">
