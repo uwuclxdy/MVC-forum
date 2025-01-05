@@ -13,4 +13,7 @@ public class Comment
 
     public required DateTime CreatedAt { get; init; }
     public required User User { get; init; }
+
+    public int Likes { get; set; } = 0;
+    public int Dislikes { get; set; } = 0;
 }

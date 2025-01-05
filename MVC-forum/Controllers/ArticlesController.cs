@@ -21,22 +21,22 @@ public class ArticlesController(ApplicationDbContext dbContext, UserManager<User
 
     [HttpGet]
     public IActionResult Article(Guid id)
-{
-    var article = dbContext.Articles
-        .Include(c => c.Comments)
-        .ThenInclude(c => c.User)
-        .FirstOrDefault(c => c.Id == id);
+    {
+        var article = dbContext.Articles
+            .Include(c => c.Comments)
+            .ThenInclude(c => c.User)
+            .FirstOrDefault(c => c.Id == id);
 
-    if (article == null) return NotFound();
+        if (article == null) return NotFound();
 
-    var author = dbContext.Users.FirstOrDefault(u => u.UserName == article.Author);
-    if (author == null || author.PfpDir == article.AuthorPfp) return View(article);
+        var author = dbContext.Users.FirstOrDefault(u => u.UserName == article.Author);
+        if (author == null || author.PfpDir == article.AuthorPfp) return View(article);
 
-    article.AuthorPfp = author.PfpDir;
-    dbContext.SaveChanges();
+        article.AuthorPfp = author.PfpDir;
+        dbContext.SaveChanges();
 
-    return View(article);
-}
+        return View(article);
+    }
 
     [HttpGet]
     public IActionResult Add()
@@ -98,4 +98,89 @@ public class ArticlesController(ApplicationDbContext dbContext, UserManager<User
         return View(model);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> LikeArticle(Guid id)
+    {
+        var user = await userManager.GetUserAsync(User);
+        if (user == null) return NotFound();
+
+        var article = await dbContext.Articles.FindAsync(id);
+        if (article == null) return NotFound();
+
+        var likeInteraction = await dbContext.UserInteractions
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == article.Id && ui.InteractionType_ == UserInteraction.InteractionType.Like);
+
+        var dislikeInteraction = await dbContext.UserInteractions
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == article.Id && ui.InteractionType_ == UserInteraction.InteractionType.Dislike);
+
+        if (likeInteraction == null)
+        {
+            if (dislikeInteraction != null)
+            {
+                dbContext.UserInteractions.Remove(dislikeInteraction);
+                article.Dislikes--;
+            }
+
+            dbContext.UserInteractions.Add(new UserInteraction
+            {
+                UserId = user.Id,
+                TargetId = article.Id,
+                InteractionType_ = UserInteraction.InteractionType.Like,
+                User = user
+            });
+            article.Likes++;
+        }
+        else
+        {
+            dbContext.UserInteractions.Remove(likeInteraction);
+            article.Likes--;
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        return RedirectToAction("Article", new { id });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DislikeArticle(Guid id)
+    {
+        var user = await userManager.GetUserAsync(User);
+        if (user == null) return NotFound();
+
+        var article = await dbContext.Articles.FindAsync(id);
+        if (article == null) return NotFound();
+
+        var likeInteraction = await dbContext.UserInteractions
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == article.Id && ui.InteractionType_ == UserInteraction.InteractionType.Like);
+
+        var dislikeInteraction = await dbContext.UserInteractions
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == article.Id && ui.InteractionType_ == UserInteraction.InteractionType.Dislike);
+
+        if (dislikeInteraction == null)
+        {
+            if (likeInteraction != null)
+            {
+                dbContext.UserInteractions.Remove(likeInteraction);
+                article.Likes--;
+            }
+
+            dbContext.UserInteractions.Add(new UserInteraction
+            {
+                UserId = user.Id,
+                TargetId = article.Id,
+                InteractionType_ = UserInteraction.InteractionType.Dislike,
+                User = user
+            });
+            article.Dislikes++;
+        }
+        else
+        {
+            dbContext.UserInteractions.Remove(dislikeInteraction);
+            article.Dislikes--;
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        return RedirectToAction("Article", new { id });
+    }
 }

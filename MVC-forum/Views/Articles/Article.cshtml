@@ -11,18 +11,31 @@
 
 <p class="mt-4 mb-4">@Model.Content</p>
 <hr/>
-<div class="card text-white mb-3" style="width: 35%; margin-left: 65%">
-    <h4 class="card-header">Avtor</h4>
-    <div class="card-body">
-        
-        <a href="@Url.Action("Profile", "Account", new { username = Model.Author })" style="text-decoration: none;">
-            <img src="@Model.AuthorPfp" class="rounded-2" style="width: 15%">
-            <br/>
-            <div class="card-title" style="font-size: 140%">@Model.Author</div>
-        </a>
+<div class="d-flex justify-content-between">
+    <div class="card text-white mb-3" style="height: min-content">
+        <h4 class="card-header">Vam je bil članek všeč?</h4>
+        <div class="card-body">
+            <form asp-controller="Articles" asp-action="LikeArticle" asp-route-id="@Model.Id" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-success btn-sm">Da (@Model.Likes)</button>
+            </form>
+            <form asp-controller="Articles" asp-action="DislikeArticle" asp-route-id="@Model.Id" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm">Ne (@Model.Dislikes)</button>
+            </form>
+        </div>
     </div>
-    <div class="card-footer bg-secondary">
-        <p class="card-text">@Model.Date.ToString("yyyy-MM-dd ob HH:mm")</p>
+
+    <div class="card text-white mb-3" style="width: 30%;">
+        <h4 class="card-header">Avtor</h4>
+        <div class="card-body">
+            <a href="@Url.Action("Profile", "Account", new { username = Model.Author })" style="text-decoration: none;">
+                <img src="@Model.AuthorPfp" class="rounded-2" style="width: 15%">
+                <br/>
+                <div class="card-title" style="font-size: 140%">@Model.Author</div>
+            </a>
+        </div>
+        <div class="card-footer bg-secondary">
+            <p class="card-text">@Model.Date.ToString("yyyy-MM-dd ob HH:mm")</p>
+        </div>
     </div>
 </div>
 <br/>
@@ -54,7 +67,14 @@
             <div class="card-body">
                 <p class="card-text">@comment.Content</p>
             </div>
-            <div class="card-footer">@comment.CreatedAt.ToString("yyyy-MM-dd ob HH:mm")</div>
+            <div class="card-footer">
+                <form asp-controller="Comments" asp-action="LikeComment" asp-route-id="@comment.Id" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Like (@comment.Likes)</button>
+                </form>
+                <form asp-controller="Comments" asp-action="DislikeComment" asp-route-id="@comment.Id" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Dislike (@comment.Dislikes)</button>
+                </form>
+            </div>
         </div>
     }
 </div>

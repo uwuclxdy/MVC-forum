@@ -21,4 +21,7 @@ public class Article
     public required DateTime Date { get; init; }
 
     public List<Comment> Comments { get; init; } = [];
+
+    public int Likes { get; set; } = 0;
+    public int Dislikes { get; set; } = 0;
 }
