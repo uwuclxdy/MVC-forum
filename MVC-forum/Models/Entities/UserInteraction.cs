@@ -6,7 +6,7 @@ public class UserInteraction
 {
     public Guid Id { get; init; }
 
-    [StringLength(128)]
+    [MaxLength(450)]
     public required string UserId { get; init; }
     public required User User { get; init; }
 

@@ -9,4 +9,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Article> Articles { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<UserInteraction> UserInteractions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Article>().ToTable("Articles");
+        modelBuilder.Entity<Comment>().ToTable("Comments");
+    }
 }

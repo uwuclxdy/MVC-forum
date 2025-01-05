@@ -63,7 +63,7 @@ namespace MVC_forum.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Articles");
+                    b.ToTable("Articles", (string)null);
                 });
 
             modelBuilder.Entity("MVC_forum.Models.Entities.Comment", b =>
@@ -98,7 +98,7 @@ namespace MVC_forum.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("MVC_forum.Models.Entities.User", b =>
@@ -193,6 +193,7 @@ namespace MVC_forum.Data.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
