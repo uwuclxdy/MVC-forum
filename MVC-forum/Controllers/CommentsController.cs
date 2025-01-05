@@ -52,10 +52,10 @@ public class CommentsController(ApplicationDbContext dbContext, UserManager<User
         if (comment == null) return NotFound();
 
         var likeInteraction = await dbContext.UserInteractions
-            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionType_ == UserInteraction.InteractionType.Like);
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionTypeType == UserInteraction.InteractionType.Like);
 
         var dislikeInteraction = await dbContext.UserInteractions
-            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionType_ == UserInteraction.InteractionType.Dislike);
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionTypeType == UserInteraction.InteractionType.Dislike);
 
         if (likeInteraction == null)
         {
@@ -69,7 +69,7 @@ public class CommentsController(ApplicationDbContext dbContext, UserManager<User
             {
                 UserId = user.Id,
                 TargetId = comment.Id,
-                InteractionType_ = UserInteraction.InteractionType.Like,
+                InteractionTypeType = UserInteraction.InteractionType.Like,
                 User = user
             });
             comment.Likes++;
@@ -95,10 +95,10 @@ public class CommentsController(ApplicationDbContext dbContext, UserManager<User
         if (comment == null) return NotFound();
 
         var likeInteraction = await dbContext.UserInteractions
-            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionType_ == UserInteraction.InteractionType.Like);
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionTypeType == UserInteraction.InteractionType.Like);
 
         var dislikeInteraction = await dbContext.UserInteractions
-            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionType_ == UserInteraction.InteractionType.Dislike);
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.TargetId == comment.Id && ui.InteractionTypeType == UserInteraction.InteractionType.Dislike);
 
         if (dislikeInteraction == null)
         {
@@ -112,7 +112,7 @@ public class CommentsController(ApplicationDbContext dbContext, UserManager<User
             {
                 UserId = user.Id,
                 TargetId = comment.Id,
-                InteractionType_ = UserInteraction.InteractionType.Dislike,
+                InteractionTypeType = UserInteraction.InteractionType.Dislike,
                 User = user
             });
             comment.Dislikes++;

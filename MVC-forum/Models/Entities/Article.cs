@@ -22,6 +22,6 @@ public class Article
 
     public List<Comment> Comments { get; init; } = [];
 
-    public int Likes { get; set; } = 0;
-    public int Dislikes { get; set; } = 0;
+    public int Likes { get; set; }
+    public int Dislikes { get; set; }
 }

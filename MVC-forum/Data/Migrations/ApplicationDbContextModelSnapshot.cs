@@ -185,7 +185,7 @@ namespace MVC_forum.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("InteractionType_")
+                    b.Property<int>("InteractionTypeType")
                         .HasColumnType("int");
 
                     b.Property<Guid>("TargetId")
