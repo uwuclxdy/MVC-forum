@@ -5,7 +5,7 @@
    Pass - Forum123
 4. update database
 
-notes to self:
+notes:
 1. create server and db https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-ver16&tabs=ubuntu2204
 2. create login - MVClogin (pass: Forum123)
 3. create user:
